@@ -4,6 +4,14 @@ import unittest
 from unittest.mock import patch
 from homework.tests_simple_employee import Employee
 
+'''
+To successfully Run this test module within 
+systemwide Python3 environment from the root of 
+the whole project you need to use following 
+single-line command in terminal:
+python -m homework.tests-hw.unittest_simple_employee
+'''
+
 
 class TestCase(unittest.TestCase):
     def setUp(self):

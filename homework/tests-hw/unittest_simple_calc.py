@@ -3,6 +3,14 @@
 import unittest
 from homework.test_simple_calc import *
 
+'''
+To successfully Run this test module within 
+systemwide Python3 environment from the root of 
+the whole project you need to use following 
+single-line command in terminal:
+python -m homework.tests-hw.unittest_simple_calc
+'''
+
 
 class TestCase(unittest.TestCase):
 
