@@ -1,13 +1,11 @@
 CREATE DATABASE knights;
-use knights;
+USE knights;
 
 CREATE TABLE kingdom_colors (
-  name VARCHAR(20),
-  color VARCHAR(10)
+    name VARCHAR(255),
+    color VARCHAR(255)
 );
 
-INSERT INTO kingdom_colors
-  (name, color)
-VALUES
-  ('London', 'Green'),
-  ('Berlin', 'Orange');
+INSERT INTO kingdom_colors (name, color) VALUES ('mordor', 'black');
+INSERT INTO kingdom_colors (name, color) VALUES ('groomers', 'blue');
+INSERT INTO kingdom_colors (name, color) VALUES ('traders', 'yellow');
