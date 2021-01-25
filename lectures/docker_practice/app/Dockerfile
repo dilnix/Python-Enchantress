@@ -1,7 +1,7 @@
 FROM python:3
-EXPOSE 8081
+EXPOSE 5000
 WORKDIR /app
-COPY requirements.txt .
+COPY requirements.txt /app
 RUN pip3 install -r requirements.txt
-COPY app.py .
+COPY app.py /app
 CMD python app.py
