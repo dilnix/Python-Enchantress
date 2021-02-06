@@ -1,0 +1,81 @@
+import psycopg2
+
+"""
+Before executing this script, you should launch your docker
+container with simple Postgres DB with following command:
+docker run -p 5432:5432 --name some-postgres -e POSTGRES_PASSWORD=qwerty -e POSTGRES_USER=dilnix -d postgres
+"""
+
+
+class RDBMS():
+    def __init__(self):
+        try:
+            self.connection = psycopg2.connect(
+                database='dilnix',
+                user='dilnix',
+                password='qwerty',
+                host='localhost',
+                port='5432'
+            )
+            self.cursor = self.connection.cursor()
+            print("Successfully connected DB")
+        except (Exception, psycopg2.Error) as error:
+            print("Can't connect to the DB", error)
+            self.connection = None
+        finally:
+            if self.connection != None:
+                self.sqlfile = open('homework/sql_practice_hw/shop.sql', 'r')
+                self.cursor.execute(self.sqlfile.read())
+                self.connection.commit()
+                print("Successfully filled DB with starting data")
+
+    def get_latest_user_id(self):
+        self.id_query = "SELECT id FROM users ORDER BY id DESC LIMIT 1;"
+        self.cursor.execute(self.id_query)
+        self.user_id = int(self.cursor.fetchone()[0])
+        # print(self.user_id)
+        return self.user_id
+
+    def create_user(self, user_info: dict):
+        self.main_query = "INSERT INTO users (name, email, registration_time) VALUES (%(name)s, %(email)s, %(registration_time)s);"
+        self.cursor.execute(self.main_query, user_info)
+        self.connection.commit()
+
+    def read_user_info(self, _id: int):
+        self.main_query = f"SELECT name, email, registration_time FROM users WHERE id = {_id};"
+        self.cursor.execute(self.main_query)
+        return self.cursor.fetchone()
+
+    def update_user(self, new_info: dict, _id: int):
+        self.main_query = f"UPDATE users SET name=%(name)s, email=%(email)s, registration_time=%(registration_time)s WHERE id = {_id};"
+        self.cursor.execute(self.main_query, new_info)
+        self.connection.commit()
+
+    def delete_user(self, _id: int):
+        self.main_query = f"DELETE FROM users WHERE id = {_id};"
+        self.cursor.execute(self.main_query)
+        self.connection.commit()
+
+    def get_latest_cart_id(self):
+        self.id_query = "SELECT id FROM cart ORDER BY id DESC LIMIT 1;"
+        self.cursor.execute(self.id_query)
+        self.cart_id = int(self.cursor.fetchone()[0])
+        # print(self.cart_id)
+        return self.cart_id
+
+
+if __name__ == '__main__':
+    myDb = RDBMS()
+    myDb.get_latest_user_id()
+    myDb.create_user({
+        'name': 'John',
+        'email': 'john@example.com',
+        'registration_time': '2021-02-04 23:34:56'
+    })
+    myDb.get_latest_user_id()
+    myDb.update_user({
+        'name': 'Travis',
+        'email': 'travis@boringmail.com',
+        'registration_time': '2021-02-04 23:45:59'
+    }, 4)
+    myDb.delete_user(4)
