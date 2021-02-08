@@ -35,6 +35,7 @@ fake_user = {
 
 
 class TestCaseGood:
+
     def test_users(self, myDb):
 
         assert myDb.create_user(addition_user) == None
@@ -46,6 +47,31 @@ class TestCaseGood:
             'Travis', 'travis@boringmail.com', datetime(2021, 2, 4, 23, 45, 59))
         myDb.delete_user(self.user_id)
         assert myDb.read_user_info(self.user_id) == None
+
+    def test_cart(self, myDb):
+
+        myDb.create_user(addition_user)
+        self.user_id = myDb.get_latest_user_id()
+        self.addition_cart = {
+            'creation_time': '2021-02-06 23:34:45',
+            'user_id': self.user_id,
+            'cart_details': [{'price': 800, 'product': 'Sport Bag'}]
+        }
+        myDb.create_cart(self.addition_cart)
+        self.cart_id = myDb.get_latest_cart_id()
+
+        assert myDb.read_cart(self.cart_id) == [
+            (datetime(2021, 2, 6, 23, 34, 45), 'Sport Bag', 800)]
+
+        self.override_cart = {
+            'id': self.cart_id,
+            'creation_time': '2021-02-06 23:34:56',
+            'user_id': self.user_id,
+            'cart_details': [
+                {'cart_id': self.cart_id, 'price': 950, 'product': 'Sport Bag'},
+                {'cart_id': self.cart_id, 'price': 1600, 'product': 'Lite Suite'}
+            ]
+        }
 
 
 class TestCaseBad:

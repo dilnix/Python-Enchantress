@@ -42,17 +42,17 @@ class RDBMS():
         self.connection.commit()
 
     def read_user_info(self, _id: int):
-        self.main_query = f"SELECT name, email, registration_time FROM users WHERE id = {_id};"
+        self.main_query = f"SELECT name, email, registration_time FROM users WHERE id={_id};"
         self.cursor.execute(self.main_query)
         return self.cursor.fetchone()
 
     def update_user(self, new_info: dict, _id: int):
-        self.main_query = f"UPDATE users SET name=%(name)s, email=%(email)s, registration_time=%(registration_time)s WHERE id = {_id};"
+        self.main_query = f"UPDATE users SET name=%(name)s, email=%(email)s, registration_time=%(registration_time)s WHERE id={_id};"
         self.cursor.execute(self.main_query, new_info)
         self.connection.commit()
 
     def delete_user(self, _id: int):
-        self.main_query = f"DELETE FROM users WHERE id = {_id};"
+        self.main_query = f"DELETE FROM users WHERE id={_id};"
         self.cursor.execute(self.main_query)
         self.connection.commit()
 
@@ -60,22 +60,72 @@ class RDBMS():
         self.id_query = "SELECT id FROM cart ORDER BY id DESC LIMIT 1;"
         self.cursor.execute(self.id_query)
         self.cart_id = int(self.cursor.fetchone()[0])
-        # print(self.cart_id)
+        print(self.cart_id)
         return self.cart_id
+
+    def create_cart(self, cart: dict):
+        self.main_query = "INSERT INTO cart (creation_time, user_id) VALUES (%(creation_time)s, %(user_id)s);"
+        self.cursor.execute(self.main_query, cart)
+        self.cart_id = self.get_latest_cart_id()
+        self.details_query = f"INSERT INTO cart_details (cart_id, price, product) VALUES ({self.cart_id}, %(price)s, %(product)s);"
+        # print(cart['cart_details'])
+        for item in cart['cart_details']:
+            # print(item)
+            self.cursor.execute(self.details_query, item)
+        self.connection.commit()
+
+    def read_cart(self, _id: int):
+        self.main_query = f"SELECT cart.creation_time, cart_details.product, cart_details.price FROM cart LEFT JOIN cart_details ON cart.id=cart_details.cart_id WHERE cart.id={_id};"
+        self.cursor.execute(self.main_query)
+        self.cart = self.cursor.fetchall()
+        print(self.cart)
+        return self.cart
+
+    def update_cart(self, cart: dict):
+        self.main_query = "UPDATE cart SET creation_time=%(creation_time)s, user_id=%(user_id)s WHERE id=%(id)s;"
+        # self.details_query = "UPDATE cart_details SET price=%(price)s, product=%(product)s WHERE cart_id=%(cart_id)s;"
+        self.details_query = "UPDATE cart_details SET price=%(price)s, product=%(product)s WHERE cart_id=%(cart_id)s; INSERT INTO cart_details SELECT %(cart_id)s, %(price)s, %(product)s WHERE %(product)s NOT IN (SELECT product FROM cart_details);"
+        self.cursor.execute(self.main_query, cart)
+        # print(cart['cart_details'])
+        for item in cart['cart_details']:
+            self.cursor.execute(self.details_query, item)
+        self.connection.commit()
+
+    def delete_cart(self, _id: int):
+        self.main_query = "DELETE FROM cart WHERE id={_id};"
+        self.details_query = "DELETE FROM cart_details WHERE cart_id=%(_id)s;"
+        self.cursor.execute(self.details_query, (_id,))
+        self.cursor.execute(self.main_query)
+        self.connection.commit()
 
 
 if __name__ == '__main__':
     myDb = RDBMS()
-    myDb.get_latest_user_id()
+    # myDb.get_latest_user_id()
     myDb.create_user({
         'name': 'John',
         'email': 'john@example.com',
         'registration_time': '2021-02-04 23:34:56'
     })
-    myDb.get_latest_user_id()
-    myDb.update_user({
-        'name': 'Travis',
-        'email': 'travis@boringmail.com',
-        'registration_time': '2021-02-04 23:45:59'
-    }, 4)
-    myDb.delete_user(4)
+    # myDb.get_latest_user_id()
+    # myDb.update_user({
+    #     'name': 'Travis',
+    #     'email': 'travis@boringmail.com',
+    #     'registration_time': '2021-02-04 23:45:59'
+    # }, 4)
+    # myDb.delete_user(4)
+    myDb.create_cart({
+        'creation_time': '2021-02-06 23:34:45',
+        'user_id': 4,
+        'cart_details': [{'price': 800, 'product': 'Sport Bag'}]
+    })
+    myDb.update_cart({
+        'id': 5,
+        'creation_time': '2021-02-06 23:34:56',
+        'user_id': 4,
+        'cart_details': [
+            {'cart_id': 5, 'price': 950, 'product': 'Sport Bag'},
+            {'cart_id': 5, 'price': 1600, 'product': 'Lite Suite'}
+        ]
+    })
+    myDb.get_latest_cart_id()
