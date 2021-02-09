@@ -72,6 +72,15 @@ class TestCaseGood:
                 {'cart_id': self.cart_id, 'price': 1600, 'product': 'Lite Suite'}
             ]
         }
+        myDb.update_cart(self.override_cart)
+
+        assert myDb.read_cart(self.cart_id) == [
+            (datetime(2021, 2, 6, 23, 34, 56), 'Sport Bag', 950),
+            (datetime(2021, 2, 6, 23, 34, 56), 'Lite Suite', 1600)]
+
+        myDb.delete_cart(self.cart_id)
+
+        assert myDb.read_cart(self.cart_id) == []
 
 
 class TestCaseBad:
@@ -85,3 +94,15 @@ class TestCaseBad:
         myDb.connection.commit()
         pytest.raises(psycopg2.Error, lambda: myDb.delete_user(3))
         myDb.connection.commit()
+
+    def test_cart(self, myDb):
+
+        myDb.create_user(addition_user)
+        self.user_id = myDb.get_latest_user_id()
+        self.fake_cart = {
+            'creation_time': 'not_a_datetime',
+            'user_id': self.user_id,
+            'cart_details': [{'price': 800, 'product': 'Sport Bag'}]
+        }
+
+        pytest.raises(psycopg2.Error, lambda: myDb.create_cart(self.fake_cart))

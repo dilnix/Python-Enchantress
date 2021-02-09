@@ -3,7 +3,7 @@ import psycopg2
 """
 Before executing this script, you should launch your docker
 container with simple Postgres DB with following command:
-docker run -p 5432:5432 --name some-postgres -e POSTGRES_PASSWORD=qwerty -e POSTGRES_USER=dilnix -d postgres
+docker run --rm -p 5432:5432 --name some-postgres -e POSTGRES_PASSWORD=qwerty -e POSTGRES_USER=dilnix -d postgres
 """
 
 
@@ -60,7 +60,7 @@ class RDBMS():
         self.id_query = "SELECT id FROM cart ORDER BY id DESC LIMIT 1;"
         self.cursor.execute(self.id_query)
         self.cart_id = int(self.cursor.fetchone()[0])
-        print(self.cart_id)
+        # print(self.cart_id)
         return self.cart_id
 
     def create_cart(self, cart: dict):
@@ -78,23 +78,29 @@ class RDBMS():
         self.main_query = f"SELECT cart.creation_time, cart_details.product, cart_details.price FROM cart LEFT JOIN cart_details ON cart.id=cart_details.cart_id WHERE cart.id={_id};"
         self.cursor.execute(self.main_query)
         self.cart = self.cursor.fetchall()
-        print(self.cart)
+        # print(self.cart)
         return self.cart
 
     def update_cart(self, cart: dict):
         self.main_query = "UPDATE cart SET creation_time=%(creation_time)s, user_id=%(user_id)s WHERE id=%(id)s;"
-        # self.details_query = "UPDATE cart_details SET price=%(price)s, product=%(product)s WHERE cart_id=%(cart_id)s;"
-        self.details_query = "UPDATE cart_details SET price=%(price)s, product=%(product)s WHERE cart_id=%(cart_id)s; INSERT INTO cart_details SELECT %(cart_id)s, %(price)s, %(product)s WHERE %(product)s NOT IN (SELECT product FROM cart_details);"
+        self.details_query = """
+        UPDATE cart_details 
+        SET price=%(price)s, product=%(product)s 
+        WHERE cart_id=%(cart_id)s AND %(product)s IN (SELECT product FROM cart_details); 
+        INSERT INTO cart_details (cart_id, price, product) 
+        SELECT %(cart_id)s, %(price)s, %(product)s 
+        WHERE %(product)s NOT IN (SELECT product FROM cart_details);
+        """
         self.cursor.execute(self.main_query, cart)
-        # print(cart['cart_details'])
         for item in cart['cart_details']:
+            # print(cart['cart_details'])
             self.cursor.execute(self.details_query, item)
         self.connection.commit()
 
     def delete_cart(self, _id: int):
-        self.main_query = "DELETE FROM cart WHERE id={_id};"
-        self.details_query = "DELETE FROM cart_details WHERE cart_id=%(_id)s;"
-        self.cursor.execute(self.details_query, (_id,))
+        self.main_query = f"DELETE FROM cart WHERE id={_id};"
+        self.details_query = f"DELETE FROM cart_details WHERE cart_id={_id};"
+        self.cursor.execute(self.details_query)
         self.cursor.execute(self.main_query)
         self.connection.commit()
 
@@ -128,4 +134,5 @@ if __name__ == '__main__':
             {'cart_id': 5, 'price': 1600, 'product': 'Lite Suite'}
         ]
     })
-    myDb.get_latest_cart_id()
+    myDb.read_cart(5)
+    # myDb.get_latest_cart_id()

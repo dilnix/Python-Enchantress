@@ -9,7 +9,6 @@ CREATE TABLE users
         registration_time TIMESTAMP
         );
 
-
 CREATE TABLE cart
         (
         id SERIAL PRIMARY KEY,
@@ -34,7 +33,6 @@ CREATE TABLE cart_details
 
 --- Just example data
 
-
 INSERT INTO users
 (name, email, registration_time)
 VALUES
@@ -49,7 +47,6 @@ VALUES
 ('2020-03-08 16:00:00', 2),
 ('2020-10-11 4:00:00', 1),
 ('2020-11-15 19:00:00', 1);
-
 
 INSERT INTO cart_details
 (cart_id, price, product)
@@ -75,7 +72,6 @@ INSERT INTO cart_details
 VALUES
 (4, 1500, 'fireworks'),
 (4, 42, 'Book: OOP for dummies');
-
 
 -- INSERT INTO cart_details
 -- (cart_id, price, product)
