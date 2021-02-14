@@ -4,7 +4,10 @@ from datetime import datetime
 amz_killer = Flask(__name__)
 
 USERS_DATABASE = {}
+CARTS_DATABASE = {}
+CART_DETAILS_DATABASE = {}
 user_counter = 1
+cart_counter = 1
 
 
 class NoSuchUser(Exception):
@@ -32,7 +35,7 @@ def create_user():
 @amz_killer.errorhandler(NoSuchUser)
 def no_such_user_handler(e):
     return {
-        "error": "no such user with id 1"
+        "error": f"no such user with id {e}"
     }, 404
 
 
@@ -44,6 +47,29 @@ def get_user(user_id):
         raise NoSuchUser(user_id)
     else:
         return user
+
+
+@amz_killer.route('/users/<int:user_id>', methods=['PUT'])
+def set_user(user_id):
+    data = request.json
+    try:
+        user = USERS_DATABASE[user_id]
+        user['name'] = data['name']
+        user['email'] = data['email']
+    except KeyError:
+        raise NoSuchUser(user_id)
+    else:
+        return {"status": "success"}, 200
+
+
+@amz_killer.route('/users/<int:user_id>', methods=['DELETE'])
+def remove_user(user_id):
+    try:
+        USERS_DATABASE.pop(user_id)
+    except KeyError:
+        raise NoSuchUser(user_id)
+    else:
+        return {"status": "success"}, 200
 
 
 if __name__ == '__main__':

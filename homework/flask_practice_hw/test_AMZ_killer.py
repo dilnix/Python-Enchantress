@@ -41,5 +41,41 @@ def test_get_user_no_such_user(store_app):
 
     assert response.status_code == 404
     assert response.json == {
-        "error": "no such user with id 1"
+        "error": "no such user with id 2"
+    }
+
+
+def test_set_user(store_app):
+    response = store_app.put(
+        '/users/1',
+        json={
+            "name": "Illia",
+            "email": "illia.sukonnik@example.com",
+        })
+
+    assert response.status_code == 200
+
+    response = store_app.put(
+        '/users/3',
+        json={
+            "name": "Illia",
+            "email": "illia.sukonnik@example.com",
+        })
+
+    assert response.status_code == 404
+    assert response.json == {
+        "error": "no such user with id 3"
+    }
+
+
+def test_remove_user(store_app):
+    response = store_app.delete('/users/1')
+
+    assert response.status_code == 200
+
+    response = store_app.delete('/users/3')
+
+    assert response.status_code == 404
+    assert response.json == {
+        "error": "no such user with id 3"
     }
