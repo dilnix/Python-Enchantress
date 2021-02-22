@@ -5,11 +5,13 @@ from flask_sqlalchemy import SQLAlchemy
 # init SQLAlchemy so we can use it later in our models
 db = SQLAlchemy()
 
+
 def create_app():
     app = Flask(__name__)
 
     app.config['SECRET_KEY'] = 'my_secret'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
