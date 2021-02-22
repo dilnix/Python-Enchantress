@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request
 from datetime import datetime
 
 amz_killer = Flask(__name__)
