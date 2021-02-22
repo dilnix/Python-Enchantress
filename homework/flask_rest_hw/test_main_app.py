@@ -1,5 +1,5 @@
 from flask import json
-from homework.flask_practice_hw.AMZ_killer import amz_killer as app
+from main_app import amz_killer as app
 from freezegun import freeze_time
 import pytest
 
