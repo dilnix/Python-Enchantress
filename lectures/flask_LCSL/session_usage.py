@@ -19,7 +19,8 @@ def index():
 def login():
     if request.method == 'POST':
         session['username'] = request.form['username']
-        # session['permanent_session_lifetime'] = ttt
+        session['permanent'] = True
+        session['permanent_session_lifetime'] = str(ttt)
         return redirect(url_for('index'))
     return '''
         <form method="post">
