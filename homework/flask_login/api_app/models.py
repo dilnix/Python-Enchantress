@@ -15,10 +15,10 @@ class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     order_time = db.Column(db.DateTime, default=datetime.utcnow)
-    line_id = db.Column(db.Integer, db.ForeignKey("order_line.id"))
 
 
 class OrderLine(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_name = db.Column(db.String(255))
     price = db.Column(db.Float)
+    order_id = db.Column(db.Integer, db.ForeignKey("order.id"))
