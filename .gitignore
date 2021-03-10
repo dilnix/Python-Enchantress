@@ -1,4 +1,4 @@
-# Byte-compiled / optimized / DLL files
+# to ignore
 __pycache__/
 .pytest_cache/
 venv/
@@ -6,3 +6,7 @@ venv/
 *.idea
 *.vscode
 *.log
+
+
+# to not ignore
+!lectures/regexp/code_on_lecture/django_success.log
