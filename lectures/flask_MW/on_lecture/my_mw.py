@@ -2,6 +2,11 @@ from flask import Flask, request
 
 from werkzeug.wrappers import Request, Response
 
+'''
+curl command to try:
+curl -XGET -H 'API_token: mytoken' -H "Content-type: application/json" 'localhost:5000'
+'''
+
 
 class OurMiddleware():
     def __init__(self, app):
