@@ -1,0 +1,17 @@
+ 4938  alembic init alembic
+ 4939  alembic list templates
+ 4940  alembic list_templates
+ 4943  alembic revision --aoutogenerate -m "Initial revision"
+ 4944  alembic revision --autogenerate -m "Initial revision"
+ 4946  $ alembic upgrade head
+ 4947  alembic upgrade head
+ 4948  alembic upgrade 7ed0be111ce9 -1
+ 4949  alembic upgrade 7ed0be111ce9
+ 4950  alembic revision -m "Second revision"
+ 4951  alembic upgrade head
+ 4952  alembic history
+ 4953  alembic history --verbose
+ 4954  alembic revision --autogenerate -m "Third revision"
+ 4955  alembic history --verbose >> al_history.log
+ 4998  history |grep alembic
+ 4999  history |grep alembic >> lectures/flask_MW/on_lecture/comm_al_history.txt
