@@ -1,0 +1,1 @@
+add method new() to OurMiddleware at my_mw.py
